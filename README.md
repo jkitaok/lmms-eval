@@ -15,9 +15,11 @@ Example :
 accelerate launch --num_processes=8 --main_process_port 12345 -m lmms_eval \
     --model video_llava   \
     --model_args pretrained='LanguageBind/Video-LLaVA-7B' \
-    --tasks worldqa_mc  \
+    --tasks worldqa  \
     --batch_size 1 \
     --log_samples \
     --log_samples_suffix debug\
     --output_path ./logs/
 ```
+
+You would also need to set your `OPENAI_API_KEY` in your environment for evaluation.
