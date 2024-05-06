@@ -53,6 +53,18 @@ class LLaMAVid(lmms):
         **kwargs,
     ) -> None:
         super().__init__()
+        """
+        To use this, you will need to first clone their repo
+
+        git clone https://github.com/dvlab-research/LLaMA-VID.git
+        cd LLaMA-VID
+        pip install -e .
+
+        And run the accelerate lmms-eval evaluation
+
+        Since their processor config is absolute path, you have to run the command inside the repo
+        or copy the processor to your working dir
+        """
 
         accelerator_kwargs = InitProcessGroupKwargs(timeout=timedelta(weeks=52))
         accelerator = Accelerator(kwargs_handlers=[accelerator_kwargs])
