@@ -1,6 +1,6 @@
 # WorldQA Evaluation
 
-The evluation of WorldQA is based on the lmms-eval.
+The evluation of WorldQA is based on the lmms-eval. The dataset of WorldQA will be downloaded automatically through running the evaluation scripts. If you want to view the data, please refer to [WorldQA](https://huggingface.co/datasets/lmms-lab/worldqa)
 
 ## Install
 1. Install `lmms-eval` as follows
