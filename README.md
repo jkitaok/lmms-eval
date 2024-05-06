@@ -1,16 +1,25 @@
 # WorldQA Evaluation
 
-To evaluate worldqa, the process is the same as evaluating the image dataset.
+The evluation of WorldQA is based on the lmms-eval.
 
-You can use
-- video_llava
-- llama_vid
+## Install
+1. Install `lmms-eval` as follows
+```
+git clone https://github.com/EvolvingLMMs-Lab/lmms-eval
+cd lmms-eval
+git checkout kc/worldqa
+pip install -e .
+```
 
-You should first install `lmms-eval` using this branch and then follow the instructions in the `model` folder for [`video_llava`](https://github.com/EvolvingLMMs-Lab/lmms-eval/blob/kc/worldqa/lmms_eval/models/video_llava.py) and [`llama_vid`](https://github.com/EvolvingLMMs-Lab/lmms-eval/blob/kc/worldqa/lmms_eval/models/llama_vid.py) to install the model.
+2. (Optional) Following the instructions in the `model` folder for [`video_llava`](https://github.com/EvolvingLMMs-Lab/lmms-eval/blob/kc/worldqa/lmms_eval/models/video_llava.py) and [`llama_vid`](https://github.com/EvolvingLMMs-Lab/lmms-eval/blob/kc/worldqa/lmms_eval/models/llama_vid.py) to install the model. And welcome to PR your models.
 
-Then, you can run worldqa.
+## Evaluation
+Example:
+model:  Video-LLaVA-7B
+```
+export OPENAI_API_KEY="XXXXX" (For open-ended evaluation)
+```
 
-Example : 
 ```bash
 accelerate launch --num_processes=8 --main_process_port 12345 -m lmms_eval \
     --model video_llava   \
@@ -21,5 +30,3 @@ accelerate launch --num_processes=8 --main_process_port 12345 -m lmms_eval \
     --log_samples_suffix debug\
     --output_path ./logs/
 ```
-
-You would also need to set your `OPENAI_API_KEY` in your environment for evaluation.
