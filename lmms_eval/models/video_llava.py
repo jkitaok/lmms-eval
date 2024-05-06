@@ -48,6 +48,15 @@ class VideoLLaVA(lmms):
         truncate_context=False,  # whether to truncate the context in generation, set it False for LLaVA-1.6
         **kwargs,
     ) -> None:
+        """
+        git clone https://github.com/PKU-YuanGroup/Video-LLaVA.git
+        cd Video-LLaVA
+        pip install -e .
+        pip install opencv-python, decord, pytorchvideo
+
+        Sometimes the snapshot download may cause some error if you use multi process and download it for the first time
+        Let it finish download and you run it again
+        """
         super().__init__()
         accelerator_kwargs = InitProcessGroupKwargs(timeout=timedelta(weeks=52))
         accelerator = Accelerator(kwargs_handlers=[accelerator_kwargs])
