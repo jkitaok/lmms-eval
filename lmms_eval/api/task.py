@@ -7,6 +7,8 @@ import re
 import ast
 import logging
 import random
+from glob import glob
+import shutil
 from tqdm import tqdm
 
 import datasets
@@ -18,6 +20,7 @@ from datasets import DownloadConfig
 from typing import Union, List, Any
 from collections.abc import Callable
 from tenacity import retry, stop_after_attempt, wait_fixed
+from huggingface_hub import snapshot_download
 
 from lmms_eval import utils
 from lmms_eval.api import samplers
@@ -681,19 +684,23 @@ class ConfigurableTask(Task):
         # If the dataset is a video dataset,
         # Recursively search whether their is a zip and unzip it to the huggingface home
         if dataset_kwargs is not None and "video" in dataset_kwargs and dataset_kwargs["video"]:
-            hf_home = os.environ["HF_HOME"]
+            hf_home = os.getenv("HF_HOME", "~/.cache/huggingface/")
             cache_dir = dataset_kwargs["cache_dir"]
-            dataset_kwargs.pop("cache_dir")
+
             cache_dir = os.path.join(hf_home, cache_dir)
             cache_path = snapshot_download(repo_id=self.DATASET_PATH, repo_type="dataset")
             zip_files = glob(os.path.join(cache_path, "**/*.zip"), recursive=True)
             if not os.path.exists(cache_dir):
                 for zip_file in zip_files:
                     shutil.unpack_archive(zip_file, cache_dir)
-            builder_script = dataset_kwargs["builder_script"]
-            self.DATASET_PATH = os.path.join(cache_path, builder_script)
+
+            if "builder_script" in dataset_kwargs:
+                builder_script = dataset_kwargs["builder_script"]
+                self.DATASET_PATH = os.path.join(cache_path, builder_script)
+                dataset_kwargs.pop("builder_script")
+
+            dataset_kwargs.pop("cache_dir")
             dataset_kwargs.pop("video")
-            dataset_kwargs.pop("builder_script")
         download_config = DownloadConfig()
         download_config.max_retries = dataset_kwargs.get("max_retries", 3) if dataset_kwargs is not None else 3
         download_config.num_proc = dataset_kwargs.get("num_proc", 8) if dataset_kwargs is not None else 8
@@ -703,15 +710,12 @@ class ConfigurableTask(Task):
             download_mode=datasets.DownloadMode.REUSE_DATASET_IF_EXISTS,
             **dataset_kwargs if dataset_kwargs is not None else {},
         )
-        if self.config.process_docs is not None:
-            for split in self.dataset:
-                if split in [
-                    self.config.training_split, self.config.validation_split, self.config.test_split, self.config.fewshot_split
-                ]:
-                    self.dataset[split] = self.config.process_docs(self.dataset[split])
-
-        # copy dataset, remove image features
-        self.dataset_no_image = self.dataset.copy()
+        self.dataset_no_image = datasets.load_dataset(
+            path=self.DATASET_PATH,
+            name=self.DATASET_NAME,
+            download_mode=datasets.DownloadMode.REUSE_DATASET_IF_EXISTS,
+            **dataset_kwargs if dataset_kwargs is not None else {},
+        )
         for doc_name in self.dataset_no_image:
             remove_cols = []
             features = self.dataset_no_image[doc_name].features
@@ -744,14 +748,20 @@ class ConfigurableTask(Task):
 
     def training_docs(self) -> datasets.Dataset:
         if self.has_training_docs():
+            if self.config.process_docs is not None:
+                return self.config.process_docs(self.dataset[self.config.training_split])
             return self.dataset[self.config.training_split]
 
     def validation_docs(self) -> datasets.Dataset:
         if self.has_validation_docs():
+            if self.config.process_docs is not None:
+                return self.config.process_docs(self.dataset[self.config.validation_split])
             return self.dataset[self.config.validation_split]
 
     def test_docs(self) -> datasets.Dataset:
         if self.has_test_docs():
+            if self.config.process_docs is not None:
+                return self.config.process_docs(self.dataset[self.config.test_split])
             return self.dataset[self.config.test_split]
 
     def fewshot_docs(self):
