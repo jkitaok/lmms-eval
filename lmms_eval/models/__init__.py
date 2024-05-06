@@ -10,6 +10,8 @@ AVAILABLE_MODELS = {
     "instructblip": "InstructBLIP",
     "minicpm_v": "MiniCPM_V",
     "idefics2": "Idefics2",
+    "llama_vid": "LLaMAVid",
+    "video_llava": "VideoLLaVA",
 }
 
 for model_name, model_class in AVAILABLE_MODELS.items():
