@@ -44,3 +44,7 @@ accelerate launch --num_processes=8 --main_process_port 12345 -m lmms_eval \
     --log_samples_suffix debug\
     --output_path ./logs/
 ```
+
+## Issue
+If you have any questions or issues, please open an issue in the [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval/issues/new). Adding the `worldqa` label will help us to track the issue.
+![issue_format](./images/issue_format.jpg)
