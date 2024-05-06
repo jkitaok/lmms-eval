@@ -52,7 +52,7 @@ class VideoLLaVA(lmms):
         git clone https://github.com/PKU-YuanGroup/Video-LLaVA.git
         cd Video-LLaVA
         pip install -e .
-        pip install opencv-python, decord, pytorchvideo
+        pip install opencv-python decord pytorchvideo
 
         Sometimes the snapshot download may cause some error if you use multi process and download it for the first time
         Let it finish download and you run it again
